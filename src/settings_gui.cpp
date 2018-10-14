@@ -48,6 +48,13 @@ static const StringID _driveside_dropdown[] = {
 	INVALID_STRING_ID
 };
 
+static const StringID _window_mode_dropdown[] = {
+    STR_GAME_OPTIONS_WINDOWMODE_WINDOWED,
+    STR_GAME_OPTIONS_WINDOWMODE_BORDERLESS,
+    STR_GAME_OPTIONS_WINDOWMODE_FULLSCREEN,
+	INVALID_STRING_ID
+};
+
 static const StringID _autosave_dropdown[] = {
 	STR_GAME_OPTIONS_AUTOSAVE_DROPDOWN_OFF,
 	STR_GAME_OPTIONS_AUTOSAVE_DROPDOWN_EVERY_1_MONTH,
@@ -291,6 +298,16 @@ struct GameOptionsWindow : Window {
 				}
 				break;
 
+			case WID_GO_WINDOWMODE_DROPDOWN: {// Setup driver mode dropdown
+				list = new DropDownList();
+				*selected_index = 0;
+				const StringID *items = _window_mode_dropdown;
+				for (int i = 0; *items != INVALID_STRING_ID; items++, i++) {
+					*list->Append() = new DropDownListStringItem(*items, i, 0);
+				}
+				break;
+            }
+
 			case WID_GO_GUI_ZOOM_DROPDOWN: {
 				list = new DropDownList();
 				*selected_index = ZOOM_LVL_OUT_4X - _gui_zoom;
@@ -329,6 +346,7 @@ struct GameOptionsWindow : Window {
 			case WID_GO_AUTOSAVE_DROPDOWN:   SetDParam(0, _autosave_dropdown[_settings_client.gui.autosave]); break;
 			case WID_GO_LANG_DROPDOWN:       SetDParamStr(0, _current_language->own_name); break;
 			case WID_GO_RESOLUTION_DROPDOWN: SetDParam(0, GetCurRes() == _num_resolutions ? STR_GAME_OPTIONS_RESOLUTION_OTHER : SPECSTR_RESOLUTION_START + GetCurRes()); break;
+			case WID_GO_WINDOWMODE_DROPDOWN: SetDParam(0, STR_NONE); break;
 			case WID_GO_GUI_ZOOM_DROPDOWN:   SetDParam(0, _gui_zoom_dropdown[ZOOM_LVL_OUT_4X - _gui_zoom]); break;
 			case WID_GO_BASE_GRF_DROPDOWN:   SetDParamStr(0, BaseGraphics::GetUsedSet()->name); break;
 			case WID_GO_BASE_GRF_STATUS:     SetDParam(0, BaseGraphics::GetUsedSet()->GetNumInvalid()); break;
@@ -446,15 +464,6 @@ struct GameOptionsWindow : Window {
 			return;
 		}
 		switch (widget) {
-			case WID_GO_FULLSCREEN_BUTTON: // Click fullscreen on/off
-				/* try to toggle full-screen on/off */
-				if (!ToggleFullScreen(!_fullscreen)) {
-					ShowErrorMessage(STR_ERROR_FULLSCREEN_FAILED, INVALID_STRING_ID, WL_ERROR);
-				}
-				this->SetWidgetLoweredState(WID_GO_FULLSCREEN_BUTTON, _fullscreen);
-				this->SetDirty();
-				break;
-
 			default: {
 				int selected;
 				DropDownList *list = this->BuildDropDownList(widget, &selected);
@@ -532,6 +541,10 @@ struct GameOptionsWindow : Window {
 				}
 				break;
 
+			case WID_GO_WINDOWMODE_DROPDOWN: // Change window format
+				this->SetDirty();
+				break;
+
 			case WID_GO_GUI_ZOOM_DROPDOWN:
 				GfxClearSpriteCache();
 				_gui_zoom = (ZoomLevel)(ZOOM_LVL_OUT_4X - index);
@@ -562,7 +575,6 @@ struct GameOptionsWindow : Window {
 	virtual void OnInvalidateData(int data = 0, bool gui_scope = true)
 	{
 		if (!gui_scope) return;
-		this->SetWidgetLoweredState(WID_GO_FULLSCREEN_BUTTON, _fullscreen);
 
 		bool missing_files = BaseGraphics::GetUsedSet()->GetNumMissing() == 0;
 		this->GetWidget<NWidgetCore>(WID_GO_BASE_GRF_STATUS)->SetDataTip(missing_files ? STR_EMPTY : STR_GAME_OPTIONS_BASE_GRF_STATUS, STR_NULL);
@@ -594,10 +606,7 @@ static const NWidgetPart _nested_game_options_widgets[] = {
 				EndContainer(),
 				NWidget(WWT_FRAME, COLOUR_GREY), SetDataTip(STR_GAME_OPTIONS_RESOLUTION, STR_NULL),
 					NWidget(WWT_DROPDOWN, COLOUR_GREY, WID_GO_RESOLUTION_DROPDOWN), SetMinimalSize(150, 12), SetDataTip(STR_BLACK_STRING, STR_GAME_OPTIONS_RESOLUTION_TOOLTIP), SetFill(1, 0), SetPadding(0, 0, 3, 0),
-					NWidget(NWID_HORIZONTAL),
-						NWidget(WWT_TEXT, COLOUR_GREY), SetMinimalSize(0, 12), SetFill(1, 0), SetDataTip(STR_GAME_OPTIONS_FULLSCREEN, STR_NULL),
-						NWidget(WWT_TEXTBTN, COLOUR_GREY, WID_GO_FULLSCREEN_BUTTON), SetMinimalSize(21, 9), SetDataTip(STR_EMPTY, STR_GAME_OPTIONS_FULLSCREEN_TOOLTIP),
-					EndContainer(),
+					NWidget(WWT_DROPDOWN, COLOUR_GREY, WID_GO_WINDOWMODE_DROPDOWN), SetMinimalSize(150, 12), SetDataTip(STR_BLACK_STRING, STR_GAME_OPTIONS_WINDOWMODE_TOOLTIP), SetFill(1, 0), SetPadding(0, 0, 3, 0),
 				EndContainer(),
 				NWidget(WWT_FRAME, COLOUR_GREY), SetDataTip(STR_GAME_OPTIONS_GUI_ZOOM_FRAME, STR_NULL),
 					NWidget(WWT_DROPDOWN, COLOUR_GREY, WID_GO_GUI_ZOOM_DROPDOWN), SetMinimalSize(150, 12), SetDataTip(STR_BLACK_STRING, STR_GAME_OPTIONS_GUI_ZOOM_DROPDOWN_TOOLTIP), SetFill(1, 0),
