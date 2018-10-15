@@ -48,6 +48,16 @@ public:
 	virtual bool ToggleFullscreen(bool fullscreen) = 0;
 
 	/**
+	 * Change the borderless setting.
+	 * @param borderless The new setting.
+	 * @return True if the change succeeded.
+	 */
+	virtual bool ToggleBorderless(bool borderless)
+    {
+        return false;
+    }
+
+	/**
 	 * Callback invoked after the blitter was changed.
 	 * This may only be called between AcquireBlitterLock and ReleaseBlitterLock.
 	 * @return True if no error.

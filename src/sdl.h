@@ -59,6 +59,7 @@ void SdlClose(uint32 x);
 		SDL_version *(SDLCALL *SDL_Linked_Version)();
 		int (SDLCALL *SDL_BlitSurface)(SDL_Surface *, SDL_Rect *, SDL_Surface *, SDL_Rect *);
 		SDL_Surface *(SDLCALL *SDL_CreateRGBSurface)(Uint32, int, int, int, Uint32, Uint32, Uint32, Uint32);
+        int (SDLCALL *SDL_WM_ToggleFullScreen)(SDL_Surface *);
 	};
 
 	extern SDLProcs sdl_proc;

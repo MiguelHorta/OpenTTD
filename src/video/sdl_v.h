@@ -29,6 +29,8 @@ public:
 
 	/* virtual */ bool ToggleFullscreen(bool fullscreen);
 
+	/* virtual */ bool ToggleBorderless(bool borderless);
+
 	/* virtual */ bool AfterBlitterChange();
 
 	/* virtual */ void AcquireBlitterLock();

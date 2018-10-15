@@ -355,7 +355,7 @@ bool VideoDriver_SDL::CreateMainSurface(uint w, uint h)
 	_requested_hwpalette = want_hwpalette;
 
 	/* DO NOT CHANGE TO HWSURFACE, IT DOES NOT WORK */
-	newscreen = SDL_CALL SDL_SetVideoMode(w, h, bpp, SDL_SWSURFACE | (want_hwpalette ? SDL_HWPALETTE : 0) | (_fullscreen ? SDL_FULLSCREEN : SDL_RESIZABLE));
+	newscreen = SDL_CALL SDL_SetVideoMode(w, h, bpp, SDL_SWSURFACE | (want_hwpalette ? SDL_HWPALETTE : 0) | (_fullscreen ? SDL_FULLSCREEN : 0 ) | (_borderless ? SDL_NOFRAME : 0) | ((!_fullscreen && !_borderless) ? SDL_RESIZABLE : 0));
 	if (newscreen == NULL) {
 		DEBUG(driver, 0, "SDL: Couldn't allocate a window to draw on");
 		return false;
@@ -389,6 +389,12 @@ bool VideoDriver_SDL::CreateMainSurface(uint w, uint h)
 		}
 	}
 
+    if (_borderless) {
+	    if (! SDL_CALL SDL_WM_ToggleFullScreen(newscreen)) {
+			DEBUG(driver, 0, "SDL: Couldn't got wm fullscreen.");
+			return false;
+        }
+    }
 	/* Delay drawing for this cycle; the next cycle will redraw the whole screen */
 	_num_dirty_rects = 0;
 
@@ -813,6 +819,21 @@ bool VideoDriver_SDL::ToggleFullscreen(bool fullscreen)
 	if (!ret) {
 		/* switching resolution failed, put back full_screen to original status */
 		_fullscreen ^= true;
+	}
+
+	if (_draw_mutex != NULL) _draw_mutex->EndCritical(true);
+	return ret;
+}
+
+bool VideoDriver_SDL::ToggleBorderless(bool borderless)
+{
+	if (_draw_mutex != NULL) _draw_mutex->BeginCritical(true);
+	_borderless = borderless;
+	GetVideoModes(); // get the list of available video modes
+	bool ret = _num_resolutions != 0 && CreateMainSurface(_resolutions[_num_resolutions-1].width, _resolutions[_num_resolutions-1].height);
+	if (!ret) {
+		/* switching resolution failed, put back full_screen to original status */
+		_borderless ^= true;
 	}
 
 	if (_draw_mutex != NULL) _draw_mutex->EndCritical(true);

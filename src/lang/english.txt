@@ -977,9 +977,9 @@ STR_GAME_OPTIONS_AUTOSAVE_DROPDOWN_EVERY_12_MONTHS              :Every 12 months
 STR_GAME_OPTIONS_LANGUAGE                                       :{BLACK}Language
 STR_GAME_OPTIONS_LANGUAGE_TOOLTIP                               :{BLACK}Select the interface language to use
 
-STR_GAME_OPTIONS_WINDOWMODE_WINDOWED                            :{BLACK}Windowed
-STR_GAME_OPTIONS_WINDOWMODE_BORDERLESS                          :{BLACK}Borderless
-STR_GAME_OPTIONS_WINDOWMODE_FULLSCREEN                          :{BLACK}Fullscreen
+STR_GAME_OPTIONS_WINDOWMODE_WINDOWED                            :Windowed
+STR_GAME_OPTIONS_WINDOWMODE_BORDERLESS                          :Borderless
+STR_GAME_OPTIONS_WINDOWMODE_FULLSCREEN                          :Fullscreen
 STR_GAME_OPTIONS_WINDOWMODE_TOOLTIP                             :{BLACK}Select how OpenTTD shall be displayed
 
 STR_GAME_OPTIONS_RESOLUTION                                     :{BLACK}Screen resolution

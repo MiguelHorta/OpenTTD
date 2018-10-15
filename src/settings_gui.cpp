@@ -118,6 +118,11 @@ static int GetCurRes()
 	return i;
 }
 
+static uint GetCurWindowMode()
+{
+    return ((uint)_fullscreen << 1) | (uint)(_borderless & !_fullscreen);
+}
+
 static void ShowCustCurrency();
 
 template <class T>
@@ -300,7 +305,7 @@ struct GameOptionsWindow : Window {
 
 			case WID_GO_WINDOWMODE_DROPDOWN: {// Setup driver mode dropdown
 				list = new DropDownList();
-				*selected_index = 0;
+				*selected_index = GetCurWindowMode();
 				const StringID *items = _window_mode_dropdown;
 				for (int i = 0; *items != INVALID_STRING_ID; items++, i++) {
 					*list->Append() = new DropDownListStringItem(*items, i, 0);
@@ -346,7 +351,7 @@ struct GameOptionsWindow : Window {
 			case WID_GO_AUTOSAVE_DROPDOWN:   SetDParam(0, _autosave_dropdown[_settings_client.gui.autosave]); break;
 			case WID_GO_LANG_DROPDOWN:       SetDParamStr(0, _current_language->own_name); break;
 			case WID_GO_RESOLUTION_DROPDOWN: SetDParam(0, GetCurRes() == _num_resolutions ? STR_GAME_OPTIONS_RESOLUTION_OTHER : SPECSTR_RESOLUTION_START + GetCurRes()); break;
-			case WID_GO_WINDOWMODE_DROPDOWN: SetDParam(0, STR_NONE); break;
+			case WID_GO_WINDOWMODE_DROPDOWN: SetDParam(0, _window_mode_dropdown[GetCurWindowMode()]); break;
 			case WID_GO_GUI_ZOOM_DROPDOWN:   SetDParam(0, _gui_zoom_dropdown[ZOOM_LVL_OUT_4X - _gui_zoom]); break;
 			case WID_GO_BASE_GRF_DROPDOWN:   SetDParamStr(0, BaseGraphics::GetUsedSet()->name); break;
 			case WID_GO_BASE_GRF_STATUS:     SetDParam(0, BaseGraphics::GetUsedSet()->GetNumInvalid()); break;
@@ -541,9 +546,41 @@ struct GameOptionsWindow : Window {
 				}
 				break;
 
-			case WID_GO_WINDOWMODE_DROPDOWN: // Change window format
-				this->SetDirty();
+			case WID_GO_WINDOWMODE_DROPDOWN: { // Change window format
+                switch (_window_mode_dropdown[index]) {
+                    case STR_GAME_OPTIONS_WINDOWMODE_WINDOWED:
+                        if (_borderless) {
+                            if (!ToggleBorderless(false)) {
+                               ShowErrorMessage(STR_ERROR_FULLSCREEN_FAILED, INVALID_STRING_ID, WL_ERROR);
+                            }
+                        } else if (_fullscreen) {
+                            if (!ToggleFullScreen(false)) {
+                               ShowErrorMessage(STR_ERROR_FULLSCREEN_FAILED, INVALID_STRING_ID, WL_ERROR);
+                            }
+                        }
+                        break;
+                    case STR_GAME_OPTIONS_WINDOWMODE_BORDERLESS:
+                        if (_fullscreen) {
+                            if (!ToggleFullScreen(false)) {
+                               ShowErrorMessage(STR_ERROR_FULLSCREEN_FAILED, INVALID_STRING_ID, WL_ERROR);
+                            }
+                        }
+                        if (!ToggleBorderless(true)) {
+                           ShowErrorMessage(STR_ERROR_FULLSCREEN_FAILED, INVALID_STRING_ID, WL_ERROR);
+                        }
+                        break;
+                    case STR_GAME_OPTIONS_WINDOWMODE_FULLSCREEN:
+                        /* try to toggle full-screen on/off */
+                       if (!ToggleFullScreen(true)) {
+                               ShowErrorMessage(STR_ERROR_FULLSCREEN_FAILED, INVALID_STRING_ID, WL_ERROR);
+                       }
+                       break;
+                    default:
+                        NOT_REACHED();
+                        break;
+                }
 				break;
+            }
 
 			case WID_GO_GUI_ZOOM_DROPDOWN:
 				GfxClearSpriteCache();

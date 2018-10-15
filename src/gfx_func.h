@@ -52,6 +52,7 @@ void CreateConsole();
 
 extern byte _dirkeys;        ///< 1 = left, 2 = up, 4 = right, 8 = down
 extern bool _fullscreen;
+extern bool _borderless;
 extern byte _support8bpp;
 extern CursorVars _cursor;
 extern bool _ctrl_pressed;   ///< Is Ctrl pressed?
@@ -165,6 +166,7 @@ void UpdateCursorSize();
 bool ChangeResInGame(int w, int h);
 void SortResolutions(int count);
 bool ToggleFullScreen(bool fs);
+bool ToggleBorderless(bool bl);
 
 /* gfx.cpp */
 byte GetCharacterWidth(FontSize size, uint32 key);

@@ -31,6 +31,7 @@
 
 byte _dirkeys;        ///< 1 = left, 2 = up, 4 = right, 8 = down
 bool _fullscreen;
+bool _borderless;
 byte _support8bpp;
 CursorVars _cursor;
 bool _ctrl_pressed;   ///< Is Ctrl pressed?
@@ -1691,6 +1692,15 @@ bool ToggleFullScreen(bool fs)
 	bool result = VideoDriver::GetInstance()->ToggleFullscreen(fs);
 	if (_fullscreen != fs && _num_resolutions == 0) {
 		DEBUG(driver, 0, "Could not find a suitable fullscreen resolution");
+	}
+	return result;
+}
+
+bool ToggleBorderless(bool bl)
+{
+	bool result = VideoDriver::GetInstance()->ToggleBorderless(bl);
+	if (_borderless != bl && _num_resolutions == 0) {
+		DEBUG(driver, 0, "Could not disable window decorations.");
 	}
 	return result;
 }
